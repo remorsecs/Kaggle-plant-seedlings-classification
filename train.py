@@ -65,19 +65,20 @@ def main():
         for stage in ['train', 'val']:
             # fetch a batch of data from data loader
             for iteration, (images, labels) in enumerate(data_loader[stage]):
-                images, labels = images.to(device), labels.to(device)
-                scores = model(images)
-                loss = cross_entropy(scores, labels)
+                with torch.set_grad_enabled(stage == 'train'):
+                    images, labels = images.to(device), labels.to(device)
+                    scores = model(images)
+                    loss = cross_entropy(scores, labels)
 
-                # log
-                print(f'\r\t{stage} loss: {loss.item():.4f} at iteration {iteration:02d}/{len(data_loader[stage])}',
-                      end='', flush=True)
+                    # log
+                    print(f'\r\t{stage} loss: {loss.item():.4f} at iteration {iteration:02d}/{len(data_loader[stage])}',
+                          end='', flush=True)
 
-                if stage == 'train':
-                    update_parameters(optimizer, loss)
-                    train_loss += loss.item()
-                else:
-                    val_loss += loss.item()
+                    if stage == 'train':
+                        update_parameters(optimizer, loss)
+                        train_loss += loss.item()
+                    else:
+                        val_loss += loss.item()
 
             if stage == 'train' and ((epoch + 1) % SAVE_INTERNAL) == 0:
                 torch.save(model.state_dict(), SAVE_ROOT / f'epoch-{epoch:02d}.pth')

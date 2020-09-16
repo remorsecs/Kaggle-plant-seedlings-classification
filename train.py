@@ -11,8 +11,8 @@ from libs.model import VGG11
 from libs.visualization import LossPresenter, LossVisualizer
 
 DATA_ROOT = os.environ['DATA_ROOT']
-DEVICE = 'cpu'
-# DEVICE = 'cuda'
+DEVICE = 'cuda'
+# DEVICE = 'cpu'
 
 # optimizer
 LEARNING_RATE = 0.0001

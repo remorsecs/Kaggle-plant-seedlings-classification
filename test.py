@@ -8,7 +8,7 @@ from torchvision import transforms
 from libs.dataset import PlantSeedlingsDataset, collate_image_filename, LabelNameConverter
 from libs.model import VGG11
 
-DEVICE = 'cuda:0'
+DEVICE = 'cuda'
 PARAMS_PATH = 'params/exp01/epoch-49.pth'
 
 # data loader

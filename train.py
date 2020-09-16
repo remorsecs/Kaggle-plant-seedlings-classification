@@ -79,7 +79,7 @@ def main():
                 else:
                     val_loss += loss.item()
 
-            if stage == 'train' and (epoch % SAVE_INTERNAL) == 0:
+            if stage == 'train' and ((epoch + 1) % SAVE_INTERNAL) == 0:
                 torch.save(model.state_dict(), SAVE_ROOT / f'epoch-{epoch:02d}.pth')
 
             print()

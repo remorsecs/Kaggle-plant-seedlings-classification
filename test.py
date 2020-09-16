@@ -9,7 +9,7 @@ from libs.dataset import PlantSeedlingsDataset, collate_image_filename, LabelNam
 from libs.model import VGG11
 
 DEVICE = 'cuda:0'
-PARAMS_PATH = 'params/epoch-99.pth'
+PARAMS_PATH = 'params/exp01/epoch-49.pth'
 
 # data loader
 BATCH_SIZE = 16

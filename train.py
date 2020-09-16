@@ -25,7 +25,7 @@ SAVE_ROOT = Path('params')
 LOG_ROOT = Path('logs')
 
 
-def build_dataloader():
+def build_data_loader():
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -52,7 +52,7 @@ def main():
     device = torch.device(DEVICE)
     model = VGG11().to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    data_loader = build_dataloader()
+    data_loader = build_data_loader()
     loss_presenter = LossPresenter()
 
     print('Start training...')

@@ -67,8 +67,9 @@ class LabelNameConverter(object):
         root_train = Path(root) / 'train'
         self._converter = {}
         index = 0
+        folders = sorted([folder for folder in root_train.iterdir()])
 
-        for folder in root_train.iterdir():
+        for folder in folders:
             self._converter[folder.name] = index
             self._converter[index] = folder.name
             index += 1

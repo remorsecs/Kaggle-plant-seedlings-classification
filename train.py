@@ -63,6 +63,7 @@ def main():
         train_loss = 0.
         val_loss = 0.
         for stage in ['train', 'val']:
+            num_corrects = 0.
             # fetch a batch of data from data loader
             for iteration, (images, labels) in enumerate(data_loader[stage]):
                 with torch.set_grad_enabled(stage == 'train'):
@@ -73,6 +74,7 @@ def main():
                     # log
                     print(f'\r\t{stage} loss: {loss.item():.4f} at iteration {iteration:02d}/{len(data_loader[stage])}',
                           end='', flush=True)
+                    num_corrects += sum(scores.argmax(dim=1) == labels)
 
                     if stage == 'train':
                         update_parameters(optimizer, loss)
@@ -83,7 +85,8 @@ def main():
             if stage == 'train' and ((epoch + 1) % SAVE_INTERNAL) == 0:
                 torch.save(model.state_dict(), SAVE_ROOT / f'epoch-{epoch:02d}.pth')
 
-            print()
+            accuracy = num_corrects / len(data_loader[stage].dataset)
+            print(f'\taccuracy: {accuracy:.4f}')
 
         train_loss /= len(data_loader['train'])
         val_loss /= len(data_loader['val'])

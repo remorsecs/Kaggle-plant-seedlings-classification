@@ -64,13 +64,14 @@ def main():
         val_loss = 0.
         for stage in ['train', 'val']:
             # fetch a batch of data from data loader
-            for images, labels in data_loader[stage]:
+            for iteration, (images, labels) in enumerate(data_loader[stage]):
                 images, labels = images.to(device), labels.to(device)
                 scores = model(images)
                 loss = cross_entropy(scores, labels)
 
                 # log
-                print(f'\t{stage} loss: {loss.item():.4f}', end='\r')
+                print(f'\r\t{stage} loss: {loss.item():.4f} at iteration {iteration:02d}/{len(data_loader[stage])}',
+                      end='', flush=True)
 
                 if stage == 'train':
                     update_parameters(optimizer, loss)

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -54,7 +55,7 @@ class PlantSeedlingsDataset(Dataset):
                 image = self._transforms(image)
 
             if self._stage == 'test':
-                return image
+                return image, self._filenames[index]
 
             return image, self._labels[index]
 
@@ -76,3 +77,14 @@ class LabelNameConverter(object):
 
     def __getitem__(self, index):
         return self._converter[index]
+
+
+def collate_image_filename(batch: list):
+    # batch = [(image_1, filename_1), (image_2, filename_2), ...]
+    batch_images = []
+    batch_filenames = []
+    for image, filename in batch:
+        batch_images.append(image)
+        batch_filenames.append(filename)
+
+    return torch.stack(batch_images), batch_filenames

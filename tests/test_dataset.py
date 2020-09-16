@@ -1,9 +1,9 @@
 import os
 
 import pytest
-from torch.utils.data import random_split
+from torch.utils.data import random_split, DataLoader
 from torchvision.transforms import transforms
-from libs.dataset import PlantSeedlingsDataset, LabelNameConverter
+from libs.dataset import PlantSeedlingsDataset, LabelNameConverter, collate_image_filename
 
 
 def base_transforms():
@@ -11,13 +11,6 @@ def base_transforms():
         transforms.Resize((256, 256)),
         transforms.ToTensor(),
     ])
-
-
-def test_dataset_accessible(dataset):
-    try:
-        print(dataset[0])
-    except Exception as e:
-        pytest.fail(f'Exception: {e}')
 
 
 @pytest.fixture(params=['train', 'test'])
@@ -28,6 +21,13 @@ def dataset(request):
         transforms=base_transforms(),
     )
     return _dataset
+
+
+def test_dataset_accessible(dataset):
+    try:
+        print(dataset[0])
+    except Exception as e:
+        pytest.fail(f'Exception: {e}')
 
 
 def test_dataset_size(dataset):
@@ -47,6 +47,23 @@ def test_split_trainset():
     try:
         print(train_set[0])
         print(val_set[0])
+    except Exception as e:
+        pytest.fail(f'Exception: {e}')
+
+
+def test_testset():
+    try:
+        _dataset = PlantSeedlingsDataset(
+            root=os.environ['DATA_ROOT'],
+            stage='test',
+            transforms=base_transforms(),
+        )
+        data_loader = DataLoader(_dataset, batch_size=16, shuffle=False, num_workers=8,
+                                 collate_fn=collate_image_filename)
+        for i, (image, filename) in enumerate(data_loader):
+            print(f'{filename}\n{image}')
+            if i == 5:
+                break
     except Exception as e:
         pytest.fail(f'Exception: {e}')
 

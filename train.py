@@ -8,6 +8,7 @@ from torchvision.transforms import transforms
 
 from libs.dataset import PlantSeedlingsDataset
 from libs.model import VGG11
+from libs.visualization import LossPresenter, LossVisualizer
 
 DATA_ROOT = os.environ['DATA_ROOT']
 DEVICE = 'cpu'
@@ -21,6 +22,7 @@ NUM_WORKERS = 8
 NUM_EPOCHS = 100
 SAVE_INTERNAL = 5
 SAVE_ROOT = Path('params')
+LOG_ROOT = Path('logs')
 
 
 def build_dataloader():
@@ -51,11 +53,15 @@ def main():
     model = VGG11().to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     data_loader = build_dataloader()
+    loss_presenter = LossPresenter()
 
     print('Start training...')
     for epoch in range(NUM_EPOCHS):
         print(f'Epoch {epoch}:')
+
         # run training and validation
+        train_loss = 0.
+        val_loss = 0.
         for stage in ['train', 'val']:
             # fetch a batch of data from data loader
             for images, labels in data_loader[stage]:
@@ -68,11 +74,21 @@ def main():
 
                 if stage == 'train':
                     update_parameters(optimizer, loss)
+                    train_loss += loss.item()
+                else:
+                    val_loss += loss.item()
 
             if stage == 'train' and (epoch % SAVE_INTERNAL) == 0:
                 torch.save(model.state_dict(), SAVE_ROOT / f'epoch-{epoch:02d}.pth')
 
             print()
+
+        train_loss /= len(data_loader['train'])
+        val_loss /= len(data_loader['val'])
+        loss_presenter.update(epoch, train_loss, val_loss)
+
+    visualizer = LossVisualizer(loss_presenter)
+    visualizer.save(LOG_ROOT / 'loss.png')
 
 
 if __name__ == '__main__':
